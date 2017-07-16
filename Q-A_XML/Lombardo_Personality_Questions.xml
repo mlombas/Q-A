@@ -1,0 +1,6 @@
+<Root>
+    <Question Question="Something">
+        <Ans Correct=true>Something Gud</Ans>  
+        <Ans Correct=false>Something bad</Ans>          
+    </Question>                  
+</Root>                         

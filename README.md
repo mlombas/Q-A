@@ -1,2 +1,2 @@
 # Q-A
-A queanstions and anwers html page
+A Questions and Answers HTML Page
