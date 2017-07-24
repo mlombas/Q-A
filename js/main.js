@@ -13,7 +13,17 @@ function start() {
     var names;
     //Get the name list by a socket message
     var socket = io();
-    console.log(socket);
+    socket.emit("requestNames");
+    socket.on("names", function(data) {
+        console.log(data);
+        for(var i = 0; i < data.length; i++) {
+            console.log("added a node");
+            var child = document.createElement("a");
+            child.onclick = "generateQuestions(" + data[i] + ")";
+            child.textContent = data[i];
+            document.getElementById("linkDiv").appendChild(child);
+        }
+    });
 } 
 
 
@@ -37,4 +47,8 @@ function triggerBg() {
         changingBg.isChanging = true;
         document.getElementById("bgButton").innerHTML = "Deactivate changing background";
     }
+}
+
+function generateNewQuestion(XMLName) {
+
 }

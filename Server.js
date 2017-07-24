@@ -1,3 +1,7 @@
+/**
+ * 
+ */
+
 var http = require("http");
 var fs = require("fs");
 var path = require("path");
@@ -11,8 +15,9 @@ var server = http.createServer(function(req, res) {
     }
     requestCount++;
     var currentRequestCount = requestCount;
-    console.log("Handling request #" + currentRequestCount + " requesting " + req.url);
-    if(req.url == "/") {
+    var requested = decodeURI(req.url);
+    console.log("Handling request #" + currentRequestCount + " requesting " + requested);
+    if(requested == "/") {
         res.writeHead(200, {"Content-Type": "text/html"});
         fs.readFile("html/index.html", function(err, data) {
             if(err) { 
@@ -24,7 +29,7 @@ var server = http.createServer(function(req, res) {
             console.log("sent: " + data);
             res.end();
         });
-    } else if(req.url == "/favicon.ico") {
+    } else if(requested == "/favicon.ico") {
         fs.readFile("img/icon.ico", function(err, data) {
             if(err) { 
                 res.write("Error " + err.errno + "(" + err.code + ") happened"); 
@@ -35,8 +40,8 @@ var server = http.createServer(function(req, res) {
             res.end();
         })
     } else {
-        var type, filepath = req.url;
-        switch(path.extname(req.url)) {
+        var type, filepath = requested;
+        switch(path.extname(requested)) {
             case ".js":
                 type = "text/js";
                 break;
@@ -52,7 +57,7 @@ var server = http.createServer(function(req, res) {
                 type = "type/xml";
                 break;
             default:
-                type = "text/" + path.extname(req.url).substring(1);
+                type = "text/" + path.extname(requested).substring(1);
                 break;
         }
         filepath = filepath.substring(1);
@@ -60,12 +65,12 @@ var server = http.createServer(function(req, res) {
             if(err) { 
                 res.write("Error " + err.errno + "(" + err.code + ") happened"); 
                 console.error("error " + err.code + " in request #" + currentRequestCount); 
-                return;
+            } else {
+                res.writeHead(200, {"Content-Type": type});
+                res.write(data);
+                res.end();
+                console.log("Request #" + currentRequestCount + " finalized");
             }
-            res.writeHead(200, {"Content-Type": type});
-            res.write(data);
-            res.end();
-            console.log("Request #" + currentRequestCount + " finalized");
             requestCount--;
         });
     }
@@ -77,12 +82,27 @@ console.log("listening in port " + port);
 
 var io = require('socket.io')(server);
 
+var XMLNames;
+
+fs.readdir("Q-A_XML", function(err, files) {
+    if(err) {
+        console.log("error " + err.code + " reading the xml dir");
+    } else {
+        XMLNames = files;
+        console.log(XMLNames);
+    }
+});
+
 io.on("connection", function(socket) {
     connectionCount++
     var currentConnectionCount = connectionCount;
     console.log("connection, user #" + currentConnectionCount);
-    socket.on("");
+    socket.on("requestNames", function(data) {
+        socket.emit("names", XMLNames);
+        console.log("emmited names to user #" + currentConnectionCount)
+    });
     socket.on("disconnect", function() {
         console.log("disconnection of user #" + currentConnectionCount);
+        connectionCount--;
     });
 })
