@@ -43,6 +43,7 @@ function start() {
             });
             child.textContent = curr.substr(0, curr.length - 4);
             document.getElementById("linkDiv").appendChild(child);
+            if(i % 3 == 0) document.getElementById("linkDiv").appendChild(document.createElement("br"));
         }
     });
 } 
@@ -83,24 +84,29 @@ function generateQuestions(XMLName) {
 }
 
 function generateNewQuestion(XMLDoc, lastcorrect) {
+    var titlesArray = questionsDiv.getElementsByTagName("h2");
     if(lastcorrect) {
         points++;
-    } else {
-        
+        if(questions) titlesArray[titlesArray.length - 1].style.color = "green";
+    } else if(questions) {
+        titlesArray[titlesArray.length - 1].style.color = "red";
     }
     questions++;
     console.log(points + "/" + questions);
     var numOfNodes = XMLDoc.getElementsByTagName("Question").length - 1;
+    var id = Math.round(Math.random() * numOfNodes);
     var currentElement = XMLDoc.getElementsByTagName("Question")[Math.round(Math.random() * numOfNodes)];
     var titleElement = document.createElement("h2");
-    titleElement.innerText = currentElement.Question;
+    titleElement.innerText = currentElement.getAttribute("Question");
     questionsDiv.appendChild(titleElement);
-    questionsDiv.appendChild(document.createElement("br"));
-    var answers = currentElement.getElementsByTagName("Ans");
-    for(var i = 0; i < answers.length; i++) {
+    var ans = currentElement.getElementsByTagName("Ans");
+    for(var i = 0; i < ans.length; i++) {
         var newChild = document.createElement("button");
-        newChild.onclick = "generateNewQuestion(" + XMLDoc + ", " + answers[i].Correct + ")";
+        newChild.innerHTML = ans[i].textContent;
+        console.log(ans[i].nodeValue);
+        newChild.attributes.onclick = "generateNewQuestion(" + XMLDoc + ", " + ans[i].getAttribute("Correct") + ")";
         questionsDiv.appendChild(newChild);
         questionsDiv.appendChild(document.createElement("br"));
     }
+    questionsDiv.appendChild(document.createElement("hr"));
 }
