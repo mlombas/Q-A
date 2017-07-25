@@ -1,11 +1,14 @@
-/**
- * 
- */
+/********************
+ * All code designed*
+ * and written by   *
+ * mocoma           *
+ ********************/
+
 
 var http = require("http");
 var fs = require("fs");
 var path = require("path");
-var port = 69;
+var port = 8080;
 var requestCount = 0;
 var connectionCount = 0;
 
@@ -26,7 +29,6 @@ var server = http.createServer(function(req, res) {
                 return;
             }
             res.write(data);
-            console.log("sent: " + data);
             res.end();
         });
     } else if(requested == "/favicon.ico") {
@@ -77,8 +79,9 @@ var server = http.createServer(function(req, res) {
     return 200;
 });
 
-server.listen(port);
-console.log("listening in port " + port);
+server.listen(port, "0.0.0.0");
+console.log("Listening in port " + port);
+
 
 var io = require('socket.io')(server);
 
@@ -89,7 +92,6 @@ fs.readdir("Q-A_XML", function(err, files) {
         console.log("error " + err.code + " reading the xml dir");
     } else {
         XMLNames = files;
-        console.log(XMLNames);
     }
 });
 
