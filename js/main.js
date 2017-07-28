@@ -14,7 +14,8 @@ var changingBg = {
     isChanging: false
 };
 var questionsDiv;
-var points = 0, questions = 0;
+var points_g = 0, questions_g = 0; //g here stands for global
+var currXMLDoc;
 
 function start() { 
     console.log("start");
@@ -34,8 +35,8 @@ function start() {
                 req.onreadystatechange = function() {
                     if(this.readyState == 4 && this.status == 200) {
                         var parser = new DOMParser();
-                        var XMLDoc = parser.parseFromString(this.responseText, "text/xml");
-                        generateNewQuestion(XMLDoc, false);
+                        currXMLDoc = parser.parseFromString(this.responseText, "text/xml");
+                        generateNewQuestion(false);
                     }
                 }
                 req.open("GET", "../Q-A_XML/" + this.innerHTML + ".xml", true);
@@ -48,65 +49,33 @@ function start() {
     });
 } 
 
-
-
-function changeBg() {
-    do { bgColor.R += Math.random() - 0.5 } while (bgColor.R < 0 || bgColor.R > 255);
-    do { bgColor.G += Math.random() - 0.5 } while (bgColor.R < 0 || bgColor.G > 255);
-    do { bgColor.B += Math.random() - 0.5 } while (bgColor.B < 0 || bgColor.B > 255);
-    console.log("change color to " + bgColor.R + " " + bgColor.G + " " + bgColor.B);
-    document.body.bgColor = "rgb(" + bgColor.R + "," + bgColor.G + "," + bgColor.B + ");";
+function checkForGood() {
+    console.log("correct");
+    points_g++;
+    generateNewQuestion();
+}
+function checkForBad() {
+    console.log("bad");
+    generateNewQuestion();
 }
 
-function triggerBg() {
-    console.log("hey");
-    if(changingBg.isChanging) {
-        clearInterval(changingBg.interval);
-        changingBg.isChanging = false;
-        document.getElementById("bgButton").innerHTML = "Activate changing background (epilepsy warning)";
-    } else {
-        changingBg.interval = setInterval(changeBg, 100);
-        changingBg.isChanging = true;
-        document.getElementById("bgButton").innerHTML = "Deactivate changing background";
-    }
-}
-
-function generateQuestions(XMLName) {
-    req = new XMLHttpRequest();
-    req.onreadystatechange = function() {
-        if(this.readyState == 4 && this.statuc == 200) {
-            var XMLDoc = this.responseXML; 
-            generateNewQuestion(XMLDoc, false);
-        }
-    }
-    req.open("GET", "Q-A_XML/" + XMLName, true);
-    req.send();
-}
-
-function generateNewQuestion(XMLDoc, lastcorrect) {
-    var titlesArray = questionsDiv.getElementsByTagName("h2");
-    if(lastcorrect) {
-        points++;
-        if(questions) titlesArray[titlesArray.length - 1].style.color = "green";
-    } else if(questions) {
-        titlesArray[titlesArray.length - 1].style.color = "red";
-    }
-    questions++;
-    console.log(points + "/" + questions);
-    var numOfNodes = XMLDoc.getElementsByTagName("Question").length - 1;
-    var id = Math.round(Math.random() * numOfNodes);
-    var currentElement = XMLDoc.getElementsByTagName("Question")[Math.round(Math.random() * numOfNodes)];
-    var titleElement = document.createElement("h2");
-    titleElement.innerText = currentElement.getAttribute("Question");
-    questionsDiv.appendChild(titleElement);
+function generateNewQuestion() {
+    var title = questionsDiv.getElementsByTagName("h2")[0];
+    questions_g++;
+    console.log(points_g + "/" + questions_g);
+    var numOfNodes = currXMLDoc.getElementsByTagName("Question").length - 1;
+    var currentElement = currXMLDoc.getElementsByTagName("Question")[Math.round(Math.random() * numOfNodes)];
+    title.innerHTML = currentElement.getAttribute("Question");
     var ans = currentElement.getElementsByTagName("Ans");
+    var ansHTML = questionsDiv.getElementsByTagName("Button");
+    while(ansHTML.length) questionsDiv.removeChild(ansHTML[ansHTML.length - 1]);
+    var newlines = questionsDiv.getElementsByTagName("br");
+    while(newlines.length) questionsDiv.removeChild(newlines[newlines.length - 1]);
     for(var i = 0; i < ans.length; i++) {
         var newChild = document.createElement("button");
-        newChild.innerHTML = ans[i].textContent;
-        console.log(ans[i].nodeValue);
-        newChild.attributes.onclick = "generateNewQuestion(" + XMLDoc + ", " + ans[i].getAttribute("Correct") + ")";
+        newChild.innerText = ans[i].innerHTML;
+        newChild.addEventListener("click", (ans[i].getAttribute("Correct") === "true") ? checkForGood : checkForBad);
         questionsDiv.appendChild(newChild);
         questionsDiv.appendChild(document.createElement("br"));
     }
-    questionsDiv.appendChild(document.createElement("hr"));
 }

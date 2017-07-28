@@ -4,11 +4,11 @@
         <Ans Correct="false">Something bad</Ans>          
     </Question>         
     <Question Question="Sumthing">
-        <Ans Correct="true">Something Gud</Ans>  
-        <Ans Correct="false">Something bad</Ans>          
+        <Ans Correct="false">Somethingu Gud</Ans>  
+        <Ans Correct="true">Something ubad</Ans>          
     </Question>
     <Question Question="sumethingu">
-        <Ans Correct="true">Something Gud</Ans>  
-        <Ans Correct="false">Something bad</Ans>          
+        <Ans Correct="true">Sumthing Gud</Ans>  
+        <Ans Correct="false">Sumthing bad</Ans>          
     </Question>             
 </Root>                         

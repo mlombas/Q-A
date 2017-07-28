@@ -1,9 +1,13 @@
-h1, h2 {
+h1, h2, h3 {
     font-family: consolas;
 }
 
 h2 {
     font-size: 110%;
+}
+
+h3 {
+    font-size: 95%;
 }
 
 button {
