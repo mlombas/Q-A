@@ -22,7 +22,7 @@ function startEffects() {
 function checkAndDoEffects() {
     framecounter++;
     var ratio = points_g / (questions_g - 1);
-    if(questions_g > 1) document.getElementById("ratio").innerHTML = ratio * 100 + "% of questions correct";
+    if(questions_g > 1) document.getElementById("ratio").innerHTML = ratio * 100 + "% of questions correct (" + points_g + " of " + (questions_g - 1) + ")";
     if(questions_g > 20 && ratio > (3/5)) changeBg();
     if(questions_g > 30 && ratio > (7/8) && framecounter % 5 == 0) doLasers(); else if(ratio < (7/8)) document.getElementById("lasersImg").src = "";
     var meterNum = 0;

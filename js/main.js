@@ -7,20 +7,18 @@
 var questionsDiv;
 var points_g = 0, questions_g = 0; //g here stands for global
 var currXMLDoc;
+var possibleIds = [];
 
 function start() { 
     startEffects();
-    console.log("start");
     questionsDiv = document.getElementById("questions");
     var names;
     //Get the name list by a socket message and put it into buttons
     var socket = io();
     socket.emit("requestNames");
     socket.on("names", function(data) {
-        console.log(data);
         for(var i = 0; i < data.length; i++) {
             var curr = data[i];
-            console.log("added a node");
             var child = document.createElement("button");
             child.addEventListener("click", function() {
                 req = new XMLHttpRequest();
@@ -28,7 +26,9 @@ function start() {
                     if(this.readyState == 4 && this.status == 200) {
                         var parser = new DOMParser();
                         currXMLDoc = parser.parseFromString(this.responseText, "text/xml");
-                        generateNewQuestion(false);
+                        possibleIds = [];
+                        for(var i = 0; i < currXMLDoc.getElementsByTagName("Question").length; i++) possibleIds.push(i);
+                        generateNewQuestion();
                     }
                 }
                 req.open("GET", "../Q-A_XML/" + this.innerHTML + ".xml", true);
@@ -42,27 +42,31 @@ function start() {
 } 
 
 function checkForGood() {
-    console.log("correct");
     points_g++;
     generateNewQuestion();
 }
 function checkForBad() {
-    console.log("bad");
     generateNewQuestion();
 }
 
 function generateNewQuestion() {
     var title = questionsDiv.getElementsByTagName("h2")[0];
     questions_g++;
-    console.log(points_g + "/" + questions_g);
     var numOfNodes = currXMLDoc.getElementsByTagName("Question").length - 1;
-    var currentElement = currXMLDoc.getElementsByTagName("Question")[Math.round(Math.random() * numOfNodes)];
+    if (possibleIds.length == 0) {
+        title.innerHTML = "All questions questioned";
+        clearButtons();
+        return;
+    }
+    var idtemptemp = Math.round(Math.random() * (possibleIds.length - 1));
+    var idTemp = possibleIds[idtemptemp];
+    for(var i = 0; i < possibleIds.length; i++)
+        if(possibleIds[i] == idTemp)
+            possibleIds.splice(i, 1);
+    var currentElement = currXMLDoc.getElementsByTagName("Question")[idTemp];
     title.innerHTML = currentElement.getAttribute("Question");
     var ans = currentElement.getElementsByTagName("Ans");
-    var ansHTML = questionsDiv.getElementsByTagName("Button");
-    while(ansHTML.length) questionsDiv.removeChild(ansHTML[ansHTML.length - 1]);
-    var newlines = questionsDiv.getElementsByTagName("br");
-    while(newlines.length) questionsDiv.removeChild(newlines[newlines.length - 1]);
+    clearButtons();
     for(var i = 0; i < ans.length; i++) {
         var newChild = document.createElement("button");
         newChild.innerText = ans[i].innerHTML;
@@ -70,4 +74,11 @@ function generateNewQuestion() {
         questionsDiv.appendChild(newChild);
         questionsDiv.appendChild(document.createElement("br"));
     }
+}
+
+function clearButtons() {
+    var ansHTML = questionsDiv.getElementsByTagName("Button");
+    while(ansHTML.length) questionsDiv.removeChild(ansHTML[ansHTML.length - 1]);
+    var newlines = questionsDiv.getElementsByTagName("br");
+    while(newlines.length) questionsDiv.removeChild(newlines[newlines.length - 1]);
 }
