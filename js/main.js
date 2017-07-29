@@ -4,20 +4,12 @@
  * mocoma           *
  ********************/
 
-var bgColor = {
-    R: Math.random() * 255,
-    G: Math.random() * 255,
-    B: Math.random() * 255
-};
-var changingBg = {
-    interval: null,
-    isChanging: false
-};
 var questionsDiv;
 var points_g = 0, questions_g = 0; //g here stands for global
 var currXMLDoc;
 
 function start() { 
+    startEffects();
     console.log("start");
     questionsDiv = document.getElementById("questions");
     var names;

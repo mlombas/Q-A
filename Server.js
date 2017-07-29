@@ -38,6 +38,7 @@ var server = http.createServer(function(req, res) {
                 console.error("error " + err.code); 
                 return;
             }
+            res.writeHead(200, {"Content-Type": "image/ico"});
             res.write(data);
             res.end();
         })
@@ -57,6 +58,9 @@ var server = http.createServer(function(req, res) {
                 break;
             case ".xml":
                 type = "type/xml";
+                break;
+            case ".png":
+                type = "image/png";
                 break;
             default:
                 type = "text/" + path.extname(requested).substring(1);
