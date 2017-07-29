@@ -1,3 +1,9 @@
+/********************
+ * All code designed*
+ * and written by   *
+ * mocoma           *
+ ********************/
+
 var bgColor = {
     R: Math.random() * 255,
     G: Math.random() * 255,
