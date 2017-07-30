@@ -21,6 +21,8 @@ function start() {
             var curr = data[i];
             var child = document.createElement("button");
             child.addEventListener("click", function() {
+                questions_g = 0;
+                points_g = 0;
                 req = new XMLHttpRequest();
                 req.onreadystatechange = function() {
                     if(this.readyState == 4 && this.status == 200) {
