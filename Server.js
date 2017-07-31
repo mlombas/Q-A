@@ -75,11 +75,11 @@ var server = http.createServer(function(req, res) {
                 res.writeHead(200, {"Content-Type": type});
                 res.write(data);
                 res.end();
-                console.log("Request #" + currentRequestCount + " finalized");
             }
-            requestCount--;
         });
     }
+    console.log("Request #" + currentRequestCount + " finalized");
+    requestCount--;
     return 200;
 });
 
